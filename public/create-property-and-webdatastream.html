@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Property and Web Data Stream</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">GA4</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="create-property.html">Create Property</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="create-property-and-webdatastream.html">Create Property and Web Data Stream</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="property-access.html">Property List</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container mt-5 d-flex justify-content-center align-items-center">
+    <div class="col-md-6">
+        <h1 class="text-center">Create Property and Web Data Stream</h1>
+        <form id="propertyAndDataStreamForm">
+            <div class="mb-3">
+                <label for="property_name" class="form-label">Property Name:</label>
+                <input type="text" class="form-control" id="property_name" name="property_name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="time_zone" class="form-label">Time Zone:</label>
+                <input type="text" class="form-control" id="time_zone" name="time_zone" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="parent" class="form-label">Parent:</label>
+                <input type="text" class="form-control" id="parent" name="parent" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="default_uri" class="form-label">Default URI:</label>
+                <input type="text" class="form-control" id="default_uri" name="default_uri" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="webstream_display_name" class="form-label">Web Data Stream Display Name:</label>
+                <input type="text" class="form-control" id="webstream_display_name" name="webstream_display_name" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Property and Web Data Stream</button>
+        </form>
+
+        <div id="response" class="mt-4 alert alert-success" style="display: none;"></div>
+    </div>
+</div>
+
+<!-- Include Bootstrap JavaScript for collapse functionality -->
+<script src="bootstrap.min.js"></script>
+<script>
+    document.getElementById("propertyAndDataStreamForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        // Get form data
+        const formData = new FormData(e.target);
+
+        // Send a POST request using AJAX
+        fetch("http://127.0.0.1:8000/api/create-property-and-webdatastream", {
+            method: "POST",
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Display the response and show the result box
+                const responseBox = document.getElementById("response");
+                responseBox.style.display = "block";
+                responseBox.innerHTML = `
+                    <strong>Measurement ID:</strong> ${data.MeasurementId}<br>
+                    <strong>Property ID:</strong> ${data.PropertyId} <!-- Corrected key -->
+                `;
+            })
+
+            .catch(error => {
+                // Handle errors
+                console.error("Error:", error);
+                // Show the result box with an error message
+                const responseBox = document.getElementById("response");
+                responseBox.style.display = "block";
+                responseBox.innerHTML = `Error: ${error.message}`;
+            });
+    });
+</script>
+</body>
+</html>

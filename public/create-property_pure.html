@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Property</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #4db8ff, #33adff);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .navbar {
+            background: #333;
+            overflow: hidden;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+        .navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-align: left; /* Align labels to the left */
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Keep content within border */
+        }
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 0 auto; /* Center the button */
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #response {
+            display: none; /* Hide result box initially */
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center; /* Center the text in the response box */
+            color: #fff;
+            background-color: #4CAF50; /* Green background color */
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <a href="create-property.html">Create Property</a>
+    <a href="create-property-and-webdatastream.html">Create Property and Web Data Stream</a>
+</div>
+
+<h1>Create Property</h1>
+<form id="propertyForm">
+    <label for="property_name">Property Name:</label>
+    <input type="text" id="property_name" name="property_name" required>
+
+    <label for="time_zone">Time Zone:</label>
+    <input type="text" id="time_zone" name="time_zone" required>
+
+    <label for="parent">Parent:</label>
+    <input type="text" id="parent" name="parent" required>
+
+    <button type="submit">Create Property</button>
+</form>
+
+<div id="response"></div>
+
+<script>
+    document.getElementById("propertyForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        // Get form data
+        const formData = new FormData(e.target);
+
+        // Send a POST request using AJAX
+        fetch("http://127.0.0.1:8000/api/create-property", {
+            method: "POST",
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Display the response and show the result box
+                const responseBox = document.getElementById("response");
+                responseBox.style.display = "block";
+                responseBox.innerHTML = `
+                    <strong>Property Display Name:</strong> ${data.property_display_name}<br>
+                    <strong>Property ID:</strong> ${data.property_id}
+                `;
+            })
+            .catch(error => {
+                // Handle errors
+                console.error("Error:", error);
+                // Show the result box with an error message
+                const responseBox = document.getElementById("response");
+                responseBox.style.display = "block";
+                responseBox.innerHTML = `Error: ${error.message}`;
+            });
+    });
+</script>
+
+</body>
+</html>

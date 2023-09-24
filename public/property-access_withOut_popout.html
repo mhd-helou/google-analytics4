@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Access</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .narrow-list-item {
+            max-width: 300px; /* Adjust the width as needed */
+            margin: 0 auto; /* Center align */
+        }
+        .loading-indicator {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">GA4</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="create-property.html">Create Property</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="create-property-and-webdatastream.html">Create Property and Web Data Stream</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="property-access.html">Property List</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5 text-center">
+    <h1 class="mb-4">Property List</h1>
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search Properties">
+                <button class="btn btn-primary" id="searchButton" type="button">Search</button>
+            </div>
+        </div>
+    </div>
+    <div class="loading-indicator">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div id="propertyList" class="list-group">
+        <!-- Property list will be displayed here -->
+    </div>
+</div>
+
+<!-- Add Bootstrap JavaScript for collapse functionality -->
+<script src="bootstrap.min.js"></script>
+<script>
+    // Function to fetch and display the list of properties
+    function fetchPropertyList() {
+        const propertyList = document.getElementById("propertyList");
+        const loadingIndicator = document.querySelector(".loading-indicator");
+
+        // Display loading indicator while fetching data
+        loadingIndicator.style.display = "block";
+
+        fetch("http://127.0.0.1:8000/api/list-all-properties")
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading indicator when data is fully loaded
+                loadingIndicator.style.display = "none";
+
+                if (Array.isArray(data.properties) && data.properties.length > 0) {
+                    data.properties.forEach(property => {
+                        propertyList.innerHTML += `
+                            <a href="#" class="list-group-item list-group-item-action narrow-list-item">
+                                <strong class="text-primary font-weight-bold">${property.display_name}</strong><br>
+                                [${property.property_id}]
+                            </a>
+                        `;
+                    });
+                } else {
+                    propertyList.innerHTML = '<div class="alert alert-warning">No properties found.</div>';
+                }
+            })
+            .catch(error => {
+                // Hide loading indicator in case of an error
+                loadingIndicator.style.display = "none";
+                console.error("Error:", error);
+                propertyList.innerHTML = '<div class="alert alert-danger">Error fetching property list.</div>';
+            });
+    }
+
+    // Call the function when the page is loaded
+    window.onload = fetchPropertyList;
+
+    // Add search functionality
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    searchButton.addEventListener("click", function () {
+        filterProperties();
+    });
+
+    searchInput.addEventListener("input", function () {
+        filterProperties();
+    });
+
+    function filterProperties() {
+        const searchValue = searchInput.value.trim().toLowerCase();
+        const listItems = document.querySelectorAll(".narrow-list-item");
+
+        listItems.forEach(item => {
+            const propertyDisplayName = item.querySelector(".font-weight-bold").textContent.toLowerCase();
+            const propertyID = item.textContent.match(/\[(.*?)\]/)[1].toLowerCase();
+
+            if (propertyDisplayName.includes(searchValue) || propertyID.includes(searchValue)) {
+                item.style.display = "block";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    }
+</script>
+</body>
+</html>
